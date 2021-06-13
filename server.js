@@ -9,6 +9,8 @@ const mongoose = require('mongoose')
 const session = require('express-session')
 const flash = require('express-flash')
 const MongoDbStore = require('connect-mongo')(session) 
+const passport = require('passport')
+const { use } = require('passport')
 
 //Database connection
 const url = 'mongodb+srv://pranjal:pranjal@ecom.okykr.mongodb.net/pizza';
@@ -40,11 +42,18 @@ app.use(session ({
     cookie: { maxAge: 1000*60*60*24} //24 hours
 }))
 
+//passport config
+const passportInit = require('./app/config/passport')
+passportInit(passport)
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use(flash())
 
 //Global middleware
 app.use((req,res,next) => {
     res.locals.session = req.session
+    res.locals.user = req.user
     next()
 })
 
@@ -56,6 +65,7 @@ app.set('view engine', 'ejs')
 //Assets
 app.use(express.static('public'))
 app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
 require('./routes/web') (app)
 
