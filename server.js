@@ -13,9 +13,7 @@ const passport = require('passport')
 const Emitter = require('events')
 
 //Database connection
-const url = 'mongodb+srv://pranjal:pranjal@ecom.okykr.mongodb.net/pizza';
-
-mongoose.connect(url, {useNewUrlParser:true, useCreateIndex:true, useUnifiedTopology:true, useFindAndModify:true });
+mongoose.connect(process.env.MONGO_CONNECTION_URL, {useNewUrlParser:true, useCreateIndex:true, useUnifiedTopology:true, useFindAndModify:true });
 const connection = mongoose.connection;
 
 connection.once('open', () => {
@@ -58,8 +56,11 @@ app.use(flash())
 app.use((req,res,next) => {
     res.locals.session = req.session
     res.locals.user = req.user
+    if(req.user)
+        res.locals.role=req.user.role
     next()
 })
+
 
 //set template engine
 app.use(expressLayout)
@@ -72,6 +73,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 require('./routes/web') (app)
+app.use( (req,res) => {
+    res.status(404).render('errors/404')
+})
 
 const server = app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`)

@@ -2,12 +2,13 @@ import axios from 'axios'
 import Noty from 'noty'
 import { initAdmin} from './admin'
 import moment from 'moment'
+import { initStripe } from './stripe'
 
 let addToCart = document.querySelectorAll('.add-to-cart')
 let cartCounter = document.querySelector('#cartCounter')
 
-function updateCart(pizza) {
-    axios.post('/update-cart', pizza).then(res => {
+function updateCart(item) {
+    axios.post('/update-cart', item).then(res => {
         cartCounter.innerText = res.data.totalQty
 
         new Noty({
@@ -31,8 +32,8 @@ function updateCart(pizza) {
 addToCart.forEach((btn) => {
     btn.addEventListener('click', () => {
         
-        let pizza = JSON.parse(btn.dataset.pizza)
-        updateCart(pizza)
+        let item = JSON.parse(btn.dataset.item)
+        updateCart(item)
     })
 })
 
@@ -67,7 +68,7 @@ function updateStatus(order) {
         if(dataProb === order.status) {
             stepCompleted = false
 
-            time.innerText = moment(order.updatteAt).format('hh:mm: A , D/M/yyyy')
+            time.innerText = moment(order.updatteAt).format('hh:mm: A')
             status.appendChild(time)
 
             if(status.nextElementSibling) {
@@ -79,6 +80,8 @@ function updateStatus(order) {
 }
 
 updateStatus(order);
+
+initStripe()
 
 // Socket 
 let socket = io()
