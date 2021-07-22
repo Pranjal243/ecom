@@ -1,6 +1,6 @@
 node_modules
 .DS_Store
-
+.env
 
 
 //5.0.4 version of laravel mix is used
